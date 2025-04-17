@@ -1,22 +1,19 @@
-## RNA seq 튜토리얼
+## RNA-Seq Differential Expression 튜토리얼
 
-https://docs.tinybio.cloud/docs/rna-seq-tutorial-from-fastq-to-figures
+출처 https://docs.tinybio.cloud/docs/rna-seq-tutorial-from-fastq-to-figures
 
+이 튜토리얼의 목표는 인간 곰팡이 병원균인 C. 파라실리시스균의 병원성 형태와 비병원성 형태 간에 차별적으로 발현되는 유전자를 찾는 것.
 
-이 튜토리얼에서는 인간 병원성 효모 C_andida parapsilosis_의 RNA-Seq 데이터 분석.
+인간 병원성 효모 C_andida parapsilosis_의 RNA-Seq 데이터 분석 튜토리얼.
 
-C. 파라실리증은 주요 기회성 곰팡이 병원체 중 하나.
+C. 파라실리증은 주요 기회성 곰팡이 병원체 중 하나. 두 가지 상태(플랑크톤 및 생물막)에서 각각 세 개의 생물학적 복제본 C. 파라실리시스균을 평가함.
 
-이 연구는 두 가지 상태(플랑크톤 및 생물막)에서 각각 세 개의 생물학적 복제본 C. 파라실리시스균을 평가함.
+샘플은 가닥별 라이브러리 준비 프로토콜로 준비한다음, 쌍단 2x90 bp 읽기 길이의 Illumina HiSeq 2000 장치를 사용하여 시퀀싱.
 
-샘플은 가닥별 라이브러리 준비 프로토콜로 준비된 다음, 쌍단 2x90 bp 읽기 길이의 Illumina HiSeq 2000 장치를 사용하여 시퀀. 모든 샘플은 효모의 차등 유전자 발현 분석을 위해 매우 풍부한 약 1,300만 개의 페어링 엔드 판독에 대해 시퀀싱되었습니다.
+모든 샘플은 효모의 차등 유전자 발현 분석을 위해 매우 풍부한 약 1,300만 개의 페어링 엔드 판독.
 
-이 튜토리얼의 목표는 인간 곰팡이 병원균인 C. 파라실리시스균의 병원성 형태와 비병원성 형태 간에 차별적으로 발현되는 유전자를 찾는 것입니다.
+세포에서 RNA가 발생되면 빠르게 보존, RNA를 cDNA로 만든 다음, cDNA를 참조 지놈, ref로 활용하여 정렬. 이때, gff를 사용햐여, 특정 gene을 참고.
 
-
-세포에서 RNA가 발생되면 빠르게 얼리거나 기타 작업으로 보존한다.
-RNA를 cDNA로 만든다음, cDNA를 참조 지놈, ref로 활용하여 정렬한다.
-이때, gff를 사용하는데, 특정 gene를 비교할 수 있다.
 
 ~~~~
 
@@ -39,7 +36,7 @@ conda env list
 
 ~~~~
 
-Steps:
+### Steps:
  1. 데이터 fastq 구함           SRA
  2. 데이터 fastq 평가           FASTQC, MultiQC
  3. 데이터 fastq 제거           Trimmomatic 
@@ -50,7 +47,7 @@ Steps:
  7. Pseudo/quasi-mapping        Kallisto, Salmon, Alevin, RapMap
  8. RNA-Seq Differential Gene Expression Analysis
 
-0. pre
+#### 0. pre
 
 ~~~~
 
@@ -61,7 +58,7 @@ mkdir -p ./ref_gen/ ./mapping ./raw_data/trimming
 
 1. 데이터 fastq 구함           SRA
 
-데이터 fastq 구하고 편하게 이름 변경
+데이터 fastq 구하고 이름 변경.
 
 Go to https://sra-explorer.info/,  search "PRJNA246482"
 
@@ -85,11 +82,11 @@ ls SRR\*gz | cut -f 1 -d "\_" | sort | uniq  > sample_ids.txt
 
 ~~~~
 
-2. 데이터 fastq 평가           FASTQC, MultiQC
+#### 2. 데이터 fastq 평가           FASTQC, MultiQC
 
-fastqc_initial에 평가 html 생성. multiqc로 하나로 만듬
+fastqc_initial에 평가 html 생성. multiqc로 하나로 만듬.
 
-FastQC는 각 fastq 파일별로 리포트 생성,
+FastQC는 각 fastq 파일별로 리포트 생성.
 
 ~~~~
 
@@ -102,13 +99,13 @@ multiqc .
 ~~~~
 
 
-3. 데이터 fastq 제거           Trimmomatic 
+#### 3. 데이터 fastq 제거           Trimmomatic 
 
 Trimmomatic은 4 가지 파일을 생성:
  * Forward-paired reads
  * Forward-unpaired reads
  * Reverse-paired reads
- * Reverse-unpaired reads.
+ * Reverse-unpaired reads
 
 ~~~~
 
@@ -117,7 +114,7 @@ cd ./trimming
 
 ~~~~
 
-4. 데이터 fastq 평가           FASTQC, MultiQC
+#### 4. 데이터 fastq 평가           FASTQC, MultiQC
 
 ~~~~
 
@@ -127,7 +124,7 @@ multiqc .
 
 ~~~~
 
-5. 참조 지놈 reference the genome
+#### 5. 참조 지놈 reference the genome
 
 * "고전적인" 접근 방식: 참조 게놈에 대한 읽기 매핑과 각 유전자에서 매핑된 읽기의 후속 계산 - Star
 * 의사 매핑 접근 방식: fastq 파일과 참조 전사본에서 발현 수준을 직접 계산 - Salmon
@@ -141,24 +138,24 @@ gunzip C_parapsilosis_CDC317_current_chromosomes.fasta.gz
 
 ~~~~
 
-6. 정렬, Alignement           Star
+#### 6. 정렬, Alignement           Star
 
-"고전적인" 접근 방식: 참조 게놈에 대한 읽기 매핑과 각 유전자에서 매핑된 읽기의 후속 계산
+"고전적인" 접근 방식: 참조 게놈에 대한 읽기 매핑과 각 유전자에서 매핑된 읽기의 후속 계산.
 
 ~~~~
 
 cd ./mapping
 ./run.sh
 
-multiqc . #
+multiqc .
 
 ~~~~
 
- * Aligned.sortedByCoord.out.bam - bam 형식의 정렬된 읽기 정렬 파일
- * Log.final.out - STAR 매핑의 최종 간결한 로그 파일
- * ReadsPerGene.out.tab - 차등 유전자 발현 분석에 사용될 읽기 횟수 데이터가 포함된 파일입니다.
+ * Aligned.sortedByCoord.out.bam - bam 형식의 정렬된 읽기 정렬 파일.
+ * Log.final.out - STAR 매핑의 최종 간결한 로그 파일.
+ * ReadsPerGene.out.tab - 차등 유전자 발현 분석에 사용될 읽기 횟수 데이터가 포함된 파일.
 
-SRR1278968_ReadsPerGene.out.tab는 4개의 Column이 있음
+SRR1278968_ReadsPerGene.out.tab는 4개의 Column이 있음.
 
  * Column 1 – gene name
  * Column 2 – counts for unstranded RNA-seq
@@ -167,7 +164,7 @@ SRR1278968_ReadsPerGene.out.tab는 4개의 Column이 있음
 
 
 
-6.1. 시각화                    igv
+#### 6.1. 시각화                    igv
 
 ~~~~
 
@@ -177,14 +174,14 @@ igv
 ~~~~
 
 
-7. Pseudo/quasi-mapping       Kallisto, Salmon, Alevin, RapMap
+#### 7. Pseudo/quasi-mapping       Kallisto, Salmon, Alevin, RapMap
 
 의사 매핑 접근 방식: fastq 파일과 참조 전사본에서 발현 수준을 직접 계산 - Salmon
 
-Pseudo/quasi-mapping은 RNA-seq에서 read들을 정렬하지 않고, transcriptome에 기반한 빠르고 효율적인 발현량 추정 방식
+Pseudo/quasi-mapping은 RNA-seq에서 read들을 정렬하지 않고, transcriptome에 기반한 빠르고 효율적인 발현량 추정 방식.
 
  * index 만들기
- *
+ * transcriptome 기반으로 정렬
 
 ~~~~
 
@@ -205,12 +202,7 @@ multiqc .
 ~~~~
 
 
-8. RNA-Seq Differential Gene Expression Analysis
+#### 8. RNA-Seq Differential Gene Expression Analysis
 
 정규화는 RNA-Seq 데이터 분석에서 중요
-
-
-
-
-
 
